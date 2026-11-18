@@ -45,7 +45,7 @@ class Source:
             text=('合成披露正文' if language=='zh' else 'Synthetic disclosure')+(' 修订' if self.phase else '')+(' other' if path=='/other' else '')
             raw=text.encode();coding='gzip' if 'gzip' in h.get('accept-encoding','') else 'identity'
             wire=gzip.compress(raw,mtime=0) if coding=='gzip' else raw
-            tag=('W/' if self.phase==1 else '')+'"'+hashlib.sha256(raw).hexdigest()[:12]+'"'
+            tag=('W/' if self.phase==1 else '')+'"'+hashlib.sha256(raw if self.phase==1 else wire).hexdigest()[:12]+'"'
             headers={'ETag':tag,'Vary':'Accept-Language, Accept-Encoding' if self.phase<2 else 'Accept-Language, Accept-Encoding, X-Disclosure-Scope','Content-Type':'text/plain; charset=utf-8','Content-Language':language,'Accept-Ranges':'bytes'}
             if coding=='gzip':headers['Content-Encoding']='gzip'
             if h.get('if-none-match')==tag:return 304,headers,b''

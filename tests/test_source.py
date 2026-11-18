@@ -31,6 +31,8 @@ class SourceContract(unittest.TestCase):
         with running_source() as (base,s):
             a=self.get(base+'/document',{'Accept-Language':'zh','Accept-Encoding':'gzip'})
             self.assertEqual(gzip.decompress(a[2]).decode(),'合成披露正文')
+            identity=self.get(base+'/document',{'Accept-Language':'zh','Accept-Encoding':'identity'})
+            self.assertNotEqual(a[1]['ETag'],identity[1]['ETag'])
             self.assertEqual(self.get(base+'/document',{'If-None-Match':a[1]['ETag'],'Accept-Encoding':'gzip'})[0],304)
             self.post(base+'/__admin/advance',{'phase':1})
             w=self.get(base+'/document');self.assertTrue(w[1]['ETag'].startswith('W/'))
